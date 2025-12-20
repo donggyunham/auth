@@ -71,7 +71,8 @@ public class SecurityConfig {
                                 .authenticationEntryPoint((request, response, authException) -> {
                                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                     response.setContentType("application/json;charset=UTF-8");
-                                    response.getWriter().write("{\"error\" : \"Unauthorized\", \"message\" : \"인증이 필요합니다.\"}");
+
+                                    response.getWriter().write("{\"error\" : \"Unauthorized\", \"message\" : \"인증이 필요합니다." + authException.getMessage() + "\"}");
                                 })
                                 // 권한 없음, 403 에러를 클라이언트에게 보냄.
                                 .accessDeniedHandler((request, response, accessDeniedException) -> {

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -56,6 +58,34 @@ public class GlobalExceptionHandler {
         log.warn("계정 오류 : {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 ApiResponse.error(ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(DuplicationEmailException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDuplicationEmailException(DuplicationEmailException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.error(ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.error(ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentialExceptionException(InvalidCredentialException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.error(ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.error("올바르지 않은 Http Method로 요청하였습니다.")//ex.getMessage()
         );
     }
 }

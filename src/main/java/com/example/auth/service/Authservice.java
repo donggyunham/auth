@@ -4,6 +4,7 @@ import com.example.auth.dto.*;
 import com.example.auth.entity.RefreshToken;
 import com.example.auth.entity.User;
 import com.example.auth.exception.AccountException;
+import com.example.auth.exception.DuplicationEmailException;
 import com.example.auth.exception.InvalidCredentialException;
 import com.example.auth.exception.TokenException;
 import com.example.auth.repository.RefreshTokenRepository;
@@ -17,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,8 @@ public class Authservice {
         // 이메일 정규화(Nomalize)
         String email = requestSignup.getEmail().trim().toLowerCase();
 
+        //log.info();
+
         try {
             // requestSignup 정보를 기반으로 User Entity 인스턴스를 생성.
             User user = User.builder()
@@ -53,7 +57,10 @@ public class Authservice {
             userRepository.save(user);
             return ApiResponse.success("회원가입 성공");
         } catch (DataIntegrityViolationException e){
-            return ApiResponse.error("이미 가입된 회원입니다.");
+            System.out.println("중복 회원 가입 시도");
+            log.warn("중복 회원 가입 시도: {}", email);
+            throw new DuplicationEmailException("이미 가입된 이메일입니다.");
+            //return ApiResponse.error("이미 가입된 회원입니다.");
         } catch (Exception e) {
             log.error("회원 가입중 오류 발생 : {}", e.getMessage());
             return ApiResponse.error("회원가입 중 오류가 발생했습니다.");
@@ -100,8 +107,8 @@ public class Authservice {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, requestLogin.getPassword())
             );
-        }catch (RuntimeException ex){
-            throw ex;
+        }catch (AuthenticationException ex){
+            throw new InvalidCredentialException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
