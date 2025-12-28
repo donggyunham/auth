@@ -42,6 +42,7 @@ public class CustomLogoutHandler implements LogoutHandler {
         String email = jwtTokenProvider.getEmailFromToken(accessToken);
         int deletedCount = refreshTokenRepository.deleteByUserEmail(email);
         System.out.println("삭제된 리프레시 토큰 개수 : " + deletedCount);
+        System.out.println("Deleted Refresh Tokens : " + deletedCount);
 
         // 쿠키 삭제
         Cookie cookie = new Cookie("refreshToken", null);

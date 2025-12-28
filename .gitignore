@@ -44,3 +44,8 @@ application.yaml
 ./logs
 *.log
 *.gz
+
+### Secret Key or Values ###
+*.pem
+*.ppk
+*.p12

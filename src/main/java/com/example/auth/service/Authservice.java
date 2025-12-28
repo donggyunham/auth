@@ -134,14 +134,18 @@ public class Authservice {
 
         refreshTokenRepository.save(refreshTokenEntity);
 
-        return LoginResponse.builder()
+        LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getNickname())
                 .provider(user.getProvider())
                 .role(user.getRole().toString())
+                .build();
+
+        return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .user(userInfo)
                 .build();
 
     }
