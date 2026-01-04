@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 services:
   auth:
     build:
@@ -12,9 +12,12 @@ services:
 
     # 환경 변수 설정
     environment:
-      DB_URL: jdbc:mysql://ls-dd458a280a664633d822205067dfe75bdaf4aabd.cjs4a6a6uli3.ap-northeast-2.rds.amazonaws.com:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-      DB_USER: dbmasteruser
-      DB_PASSWORD: ",Y&:Nn^FQef,li5)Ov<t].I|JC|uI]rF"
+      url: jdbc:mysql://mysql-8:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      username: root
+      password: 1234
+      #DB_URL: jdbc:mysql://ls-dd458a280a664633d822205067dfe75bdaf4aabd.cjs4a6a6uli3.ap-northeast-2.rds.amazonaws.com:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      #DB_USER: dbmasteruser
+      #DB_PASSWORD: ",Y&:Nn^FQef,li5)Ov<t].I|JC|uI]rF"
 
       JWT_SECRET: XE0MVi2G3c1N2YQW623uzEPYKWEdB0osLRXJRnmM+41MzqDVTWRIaybn1yLFeVrUck25MZ+ZKnwcLQnnw75dZA==
       JWT_ACCESS_TOKEN_EXPIRATION: 600000
@@ -22,13 +25,16 @@ services:
 
       KAKAO_CLIENT_ID: 86e69bc47d238c761192f7e22c26814a
       KAKAO_CLIENT_SECRET: KcYkzdiYU2WgDIqWJ0M25PD9je0ZQmKP
-      KAKAO_REDIRECT_URI: http:/Q/localhost:8070/oauth/kakao/callback
+      KAKAO_REDIRECT_URI: http://localhost:8070/api/oauth/kakao/callback
 
-      # Spring profile 정보
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      # Spring profile 정보(개발 전용, 로컬 환경에서 테스트)
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      #SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
 
     # 네트워크 설정
-    network_mode: bridge
+    networks:
+      - auth-network
+    #network_mode: bridge
 
     # 의존성(Dependency)
     external_links:
@@ -36,10 +42,20 @@ services:
 
     # 재시작 정책
     restart: unless-stopped
+# 기존 auth-network에 연결.
+networks:
+  auth-network:
+    #driver: bridge
+    external: true
+    name: auth-network
 
 ######################################################
 # 1. auth container 실행
+# 빌드하지 않고 백그라운드로 컨테이너를 바로 실행하기
 # docker compose up -d
+
+# 빌드하고 백그라운드로 컨테이너를 실행하기
+# docker compose up -d --build
 
 # 2. 로그 확인하기(실시간, 종료하려면 ctrl+c)
 # docker compose logs -f auth

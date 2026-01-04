@@ -1,0 +1,167 @@
+# version: '3.8'
+services:
+  # mysql 데이터베이스 서비스
+  mysql:
+    # 베이스가 되는 이미지 버전을 명시
+    image: mysql:8
+    container_name: prod-mysql
+
+    # mysql 접속 포트 설정
+    ports:
+      - "3306:3306"
+
+    environment:
+      # root password
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+
+      # 데이터베이스 자동 생성
+      MYSQL_DATABASE: ${DB_NAME}
+
+      # 시간대 설정
+      TZ: Asia/Seoul
+
+    # 볼륨 설정하여 데이터를 영구 저장하도록 설정
+    volumes:
+      - prod-mysql-data:/var/lib/mysql
+
+    # 독립적인 네트워크 서비스를 구성하고 여기에 연결
+    networks:
+      - prod-auth-network
+
+    # 헬스 체크
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+    # logging
+    logging:
+      driver: "json-file"
+      options:
+        # log file max size 10mBytes
+        max-size: "10m"
+        # log file count, old file auto delete
+        max-file: "3"
+
+    # 재시작 정책
+    # unless-stopped : 수동으로 중지하지 않는 한 항상 재시작하도록 설정
+    # 서버 부팅시 자동으로 재시작, 컨테이너 크래시 시 자동으로 재시작
+    # 사용자 조작으로 stop시 재시작하지 않음.
+    restart: unless-stopped
+
+  # 백엔드 서비스
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: ghcr.io/donggyunham/auth-backend:latest
+
+    container_name: prod-auth
+
+    ports:
+      - "8070:8070"
+
+    # 환경 변수 설정
+    environment:
+      url: ${DB_URL}
+      username: ${DB_USER}
+      password: ${DB_PASSWORD}
+      #url: jdbc:mysql://mysql-8:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      #username: root
+      #password: 1234
+      #DB_URL: jdbc:mysql://ls-dd458a280a664633d822205067dfe75bdaf4aabd.cjs4a6a6uli3.ap-northeast-2.rds.amazonaws.com:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      #DB_USER: dbmasteruser
+      #DB_PASSWORD: ",Y&:Nn^FQef,li5)Ov<t].I|JC|uI]rF"
+
+      # Spring profile 정보(개발 전용, 로컬 환경에서 테스트)
+
+      JWT_SECRET: ${JWT_SECRET}
+      #XE0MVi2G3c1N2YQW623uzEPYKWEdB0osLRXJRnmM+41MzqDVTWRIaybn1yLFeVrUck25MZ+ZKnwcLQnnw75dZA==
+      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION}
+      #600000
+      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION}
+      #604800000
+
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      #86e69bc47d238c761192f7e22c26814a
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
+      #KcYkzdiYU2WgDIqWJ0M25PD9je0ZQmKP
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI}
+      #http://localhost:8070/api/oauth/kakao/callback
+
+      # front-end url 설정
+      FRONTEND_URL: ${FRONTEND_URL}
+
+      # Spring profile 정보(개발 전용, 로컬 환경에서 테스트)
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      #SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+
+    # 네트워크 설정
+    networks:
+      - prod-auth-network
+    #network_mode: bridge
+
+    # 의존성(Dependency) 설정
+    # mysql 서비스가 완전히 준비되면 시작.
+    depends_on:
+      mysql:
+        condition: service_healthy
+      #external_links:
+      #- mysql-8
+
+    # 재시작 정책
+    restart: unless-stopped
+
+    # logging
+    logging:
+      driver: "json-file"
+      options:
+        # log file max size 10mBytes
+        max-size: "10m"
+        # log file count, old file auto delete
+        max-file: "3"
+
+# 기존 auth-network에 연결.
+networks:
+  prod-auth-network:
+    driver: bridge
+    external: true
+    name: prod-auth-network
+
+# 볼륨 설정
+volumes:
+  prod-mysql-data:
+    driver: local
+    name: prod-mysql-data
+
+
+######################################################
+# 1. auth container 실행
+# 빌드하지 않고 백그라운드로 컨테이너를 바로 실행하기
+# docker compose up -d
+
+# 빌드하고 백그라운드로 컨테이너를 실행하기
+# docker compose up -d --build
+
+# 2. 로그 확인하기(실시간, 종료하려면 ctrl+c)
+# docker compose logs -f auth
+
+# 3. conatainer 중지
+# docker compose stop
+
+# 4. 재시작
+# docker compose restart
+
+# 5. 삭제
+# docker compose down
+# 볼륨까지 삭제 시
+# docker compose down -v
+
+# 6. build 후 시작하기
+# docker compose up -d --build
+
+# 7. 컨테이너 & 이미지 삭제
+# docker compose down --rmi all

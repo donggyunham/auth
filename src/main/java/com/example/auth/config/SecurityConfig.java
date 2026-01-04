@@ -54,15 +54,15 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // spring security의 표준
                 .logout((logout)->{
-                    logout.logoutUrl("/logout")
+                    logout.logoutUrl("/api/logout")
                             .addLogoutHandler(customLogoutHandler)
                             .logoutSuccessHandler(customSuccesslogoutHandler)
                             .permitAll();
                 })
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/health", "/signup", "/login", "/refresh", "/loginEx").permitAll()  // 여기에 적힌 route를 통과시킴
-                                .requestMatchers("/oauth/kakao/**").permitAll()
+                                .requestMatchers("/api/health", "/api/signup", "/api/login", "/api/refresh", "/api/loginEx").permitAll()  // 여기에 적힌 route를 통과시킴
+                                .requestMatchers("/api/oauth/kakao/**").permitAll()
                                 .anyRequest().authenticated()   // 그 외는 다 인증 필요
                 )
                 .exceptionHandling(ex ->

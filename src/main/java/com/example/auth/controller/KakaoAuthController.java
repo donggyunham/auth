@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/oauth/kakao")
+@RequestMapping("/api/oauth/kakao")
 public class KakaoAuthController {
 
     private final KakaoAuthService kakaoAuthService;
