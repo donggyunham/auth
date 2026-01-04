@@ -9,7 +9,7 @@ on:
 
 env:
   # 환경 변수 지정
-  IMAGE_NAME: donggyunham/auth-backend:latest
+  IMAGE_NAME: donggyunham/auth-backend
   # github container registry
   REGISTRY: ghcr.io
 
