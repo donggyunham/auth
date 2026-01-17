@@ -114,7 +114,7 @@ jobs:
             ls -lh ~/auth/docker-compose.prod.yml
             
             cat > .env << 'EOF'
-            DB_NAME=${{DB_NAME}}
+            DB_NAME=${{ DB_NAME }}
             DB_URL=${{ secrets.DB_URL }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
