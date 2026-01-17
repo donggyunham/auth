@@ -12,7 +12,7 @@ services:
 
     # 환경 변수 설정
     environment:
-      url: jdbc:mysql://mysql-8:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://mysql8:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
       username: root
       password: 1234
       #DB_URL: jdbc:mysql://ls-dd458a280a664633d822205067dfe75bdaf4aabd.cjs4a6a6uli3.ap-northeast-2.rds.amazonaws.com:3306/qktmzmfks9?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
@@ -38,7 +38,7 @@ services:
 
     # 의존성(Dependency)
     external_links:
-      - mysql-8
+      - mysql8
 
     # 재시작 정책
     restart: unless-stopped
