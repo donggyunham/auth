@@ -36,7 +36,7 @@ public class KakaoAuthService {
     private final ObjectMapper objectMapper;
 
     // 대문자는 상수로 인식해서 변경x
-    @Value("${oauth.kakao.provider_name}")
+    @Value("${oauth.kakao.provider_name:KAKAO}")
     private String PROVIDER_NAME;
 
     /**
