@@ -31,4 +31,11 @@ public class UserController {
 
         return ResponseEntity.ok(ApiResponse.success("안녕하세요."));
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<String>> profile(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(ApiResponse.success("사용자 프로필 조회"));
+    }
 }
