@@ -49,3 +49,9 @@ application.yaml
 *.pem
 *.ppk
 *.p12
+
+### image
+/uploads
+*.jpg
+*.png
+*.webp
